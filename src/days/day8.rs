@@ -1,5 +1,3 @@
-use std::ops::Range;
-
 use crate::days::util;
 
 pub(crate) fn part1() {
@@ -8,12 +6,10 @@ pub(crate) fn part1() {
     let mut grid: Vec<Vec<u32>> = Vec::new();
     let mut grid_size: usize = 0;
     if let Ok(lines) = util::read_lines("resources\\in8.txt") {
-        for line in lines {
-            if let Ok(ip) = line {
-                grid_size = ip.len();
-                let numbers: Vec<u32> = ip.chars().map(|x| x.to_digit(10).unwrap()).collect();
-                grid.push(numbers);
-            }
+        for line in lines.flatten() {
+            grid_size = line.len();
+            let numbers: Vec<u32> = line.chars().map(|x| x.to_digit(10).unwrap()).collect();
+            grid.push(numbers);
         }
     }
 
@@ -29,8 +25,8 @@ pub(crate) fn part1() {
                 num_trees_visible += 1;
             } else {
                 let mut column: Vec<u32> = Vec::new();
-                for i in 0..grid_size {
-                    column.push(grid[i][col_index]);
+                for row in grid.iter().take(grid_size) {
+                    column.push(row[col_index]);
                 }
 
                 let visible_above = &column[0..row_index]
@@ -53,7 +49,7 @@ pub(crate) fn part1() {
     println!("{} trees visible", num_trees_visible);
 }
 
-fn get_view_distance(line: &Vec<u32>, range: impl Iterator<Item = usize>, height: &u32) -> usize {
+fn get_view_distance(line: &[u32], range: impl Iterator<Item = usize>, height: &u32) -> usize {
     let mut count = 0;
     for i in range {
         count += 1;
@@ -61,7 +57,7 @@ fn get_view_distance(line: &Vec<u32>, range: impl Iterator<Item = usize>, height
             break;
         }
     }
-    return count;
+    count
 }
 
 pub(crate) fn part2() {
@@ -70,12 +66,10 @@ pub(crate) fn part2() {
     let mut grid: Vec<Vec<u32>> = Vec::new();
     let mut grid_size: usize = 0;
     if let Ok(lines) = util::read_lines("resources\\in8.txt") {
-        for line in lines {
-            if let Ok(ip) = line {
-                grid_size = ip.len();
-                let numbers: Vec<u32> = ip.chars().map(|x| x.to_digit(10).unwrap()).collect();
-                grid.push(numbers);
-            }
+        for line in lines.flatten() {
+            grid_size = line.len();
+            let numbers: Vec<u32> = line.chars().map(|x| x.to_digit(10).unwrap()).collect();
+            grid.push(numbers);
         }
     }
 
@@ -83,13 +77,13 @@ pub(crate) fn part2() {
     for (row_index, row) in grid.iter().enumerate() {
         for (col_index, height) in row.iter().enumerate() {
             let mut column: Vec<u32> = Vec::new();
-            for i in 0..grid_size {
-                column.push(grid[i][col_index]);
+            for row in grid.iter().take(grid_size) {
+                column.push(row[col_index]);
             }
             let distance_up = get_view_distance(&column, (0..row_index).rev(), height);
             let distance_down = get_view_distance(&column, row_index + 1..grid_size, height);
-            let distance_left = get_view_distance(&row, (0..col_index).rev(), height);
-            let distance_right = get_view_distance(&row, col_index + 1..grid_size, height);
+            let distance_left = get_view_distance(row, (0..col_index).rev(), height);
+            let distance_right = get_view_distance(row, col_index + 1..grid_size, height);
 
             let scenic_score = distance_up * distance_down * distance_left * distance_right;
             if scenic_score > max_scenic_score {

@@ -1,25 +1,23 @@
-use std::collections::{HashMap, HashSet};
 use crate::days::util;
+use std::collections::{HashMap, HashSet};
 const ALPHABET: &str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 pub(crate) fn part1() {
     println!("Day 3 Part 1");
     let priority_map = get_priorities();
-    if let Ok(lines) = util::read_lines("resources\\in3.txt" ) {
+    if let Ok(lines) = util::read_lines("resources\\in3.txt") {
         let mut priorities_sum = 0;
-        for line in lines {
-            if let Ok(ip) = line {
-                let line_length = ip.chars().count();
-                let (sack1, sack2) = ip.split_at(line_length/2);
-                let mut matching_char: char = ' ';
-                for character in sack1.chars() {
-                    if sack2.contains(character) {
-                        matching_char = character;
-                        break;
-                    }
+        for line in lines.flatten() {
+            let line_length = line.chars().count();
+            let (sack1, sack2) = line.split_at(line_length / 2);
+            let mut matching_char: char = ' ';
+            for character in sack1.chars() {
+                if sack2.contains(character) {
+                    matching_char = character;
+                    break;
                 }
-                priorities_sum += priority_map.get(&matching_char).unwrap();
             }
+            priorities_sum += priority_map.get(&matching_char).unwrap();
         }
         println!("Sum of all priorities is: {}", priorities_sum);
     }
@@ -28,29 +26,27 @@ pub(crate) fn part1() {
 pub(crate) fn part2() {
     println!("Day 3 Part 2");
     let priority_map = get_priorities();
-    if let Ok(lines) = util::read_lines("resources\\in3.txt" ) {
+    if let Ok(lines) = util::read_lines("resources\\in3.txt") {
         let mut priorities_sum = 0;
         let mut vec: Vec<String> = Vec::new();
-        for line in lines {
-            if let Ok(ip) = line {
-                vec.push(ip);
-                if vec.len() == 3 {
-                    let mut matching_chars: HashSet<char> = HashSet::new();
-                    let sack1 = &vec[0];
-                    let sack2 = &vec[1];
-                    let sack3 = &vec[2];
-                    for character in sack1.chars() {
-                        if sack2.contains(character) {
-                            matching_chars.insert(character);
-                        }
+        for line in lines.flatten() {
+            vec.push(line);
+            if vec.len() == 3 {
+                let mut matching_chars: HashSet<char> = HashSet::new();
+                let sack1 = &vec[0];
+                let sack2 = &vec[1];
+                let sack3 = &vec[2];
+                for character in sack1.chars() {
+                    if sack2.contains(character) {
+                        matching_chars.insert(character);
                     }
-                    for character in matching_chars {
-                        if sack3.contains(character) {
-                            priorities_sum += priority_map.get(&character).unwrap();
-                        }
-                    }
-                    vec.clear();
                 }
+                for character in matching_chars {
+                    if sack3.contains(character) {
+                        priorities_sum += priority_map.get(&character).unwrap();
+                    }
+                }
+                vec.clear();
             }
         }
         println!("Sum of all priorities is: {}", priorities_sum);
